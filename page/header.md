@@ -1,8 +1,7 @@
-# [Lichen-Markdown](index.md)
-
 <menu>
-— [Code repository](https://github.com/Ospac/lichen-markdown-custom) 
-— [Markdown cheatsheet](cheatsheet.md) 
-— [about](about.md) 
-—
+	<a href="/">frankstainlove.xyz</a>
+	☡ [about](about.md) 
+	☡ [texts](texts/index.md)
+	☡ [photography]()
+	♌︎
 </menu>
