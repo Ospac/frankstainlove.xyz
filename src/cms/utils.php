@@ -14,14 +14,18 @@ use Michelf\MarkdownExtra;
 function parse_frontmatter($source)
 {
     $metadata = [];
-    $pattern = '/\A(?:\xEF\xBB\xBF)?---\s*\R(.*?)\R---\s*(?:\R|\z)/s';
+    $lineBreak = '(?:\r\n|\r|\n)';
+    $pattern = '/\A(?:\xEF\xBB\xBF)?---[ \t]*' . $lineBreak
+        . '(.*?)' . $lineBreak . '---[ \t]*(?:' . $lineBreak . '|\z)/s';
 
     if (!preg_match($pattern, $source, $matches)) {
         return [$metadata, $source];
     }
 
-    foreach (preg_split('/\R/', $matches[1]) as $line) {
-        if (preg_match('/^\s*([A-Za-z0-9_-]+)\s*:\s*(.*?)\s*$/', $line, $fields)) {
+    foreach (preg_split('/\r\n|\r|\n/', $matches[1]) as $line) {
+        // Restrict whitespace matching to ASCII spaces and tabs. Using \s here
+        // can consume bytes from UTF-8 characters such as Korean text.
+        if (preg_match('/^[ \t]*([A-Za-z0-9_-]+)[ \t]*:[ \t]*(.*?)[ \t]*$/', $line, $fields)) {
             $value = trim($fields[2]);
             if (strlen($value) >= 2) {
                 $first = $value[0];
@@ -94,19 +98,44 @@ function render_func($path, $ext, $_src = "")
         $footer = render_l11n_layout("footer.md", $path);
     }
 
-    $title = $metadata['title'] ?? null;
     $requestedLayout = $metadata['layout'] ?? null;
-    $layout = 'default';
+    $defaultLayoutFileName = 'default';
     if (is_string($requestedLayout) && preg_match('/^[A-Za-z0-9_-]+$/', $requestedLayout)) {
         $requestedLayoutPath = LAYOUT_DIR . '/' . $requestedLayout . '.php';
         if (is_file($requestedLayoutPath)) {
-            $layout = $requestedLayout;
+            $defaultLayoutFileName = $requestedLayout;
         }
     }
 
+    // Expose frontmatter values directly to layouts. Values are escaped here
+    // so layout files can use arbitrary frontmatter variables without
+    // repeating HTML escaping.
+    $metadata['title'] = $metadata['title'] ?? 'lichen-markdown';
+    $metadata['layout'] = $defaultLayoutFileName;
+
+    foreach ($metadata as $name => $value) {
+        if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name)) {
+            unset($metadata[$name]);
+            continue;
+        }
+
+        $metadata[$name] = htmlspecialchars(
+            (string) $value,
+            ENT_QUOTES | ENT_SUBSTITUTE,
+            'UTF-8'
+        );
+    }
+
+    extract($metadata, EXTR_SKIP);
+
+    set_error_handler(function () {
+        return true;
+    }, E_WARNING | E_NOTICE);
+
     ob_start();
-    include LAYOUT_DIR . '/' . $layout . '.php';
+    include LAYOUT_DIR . '/' . $defaultLayoutFileName . '.php';
     $output = ob_get_clean();
+    restore_error_handler();
     $output = rewrite_asset_paths($output, $path);
     return rewrite_internal_links($output, $path);
 }
