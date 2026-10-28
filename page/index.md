@@ -1,1 +1,1 @@
-![dandi.jpg](assets/image/index/dandi.jpg)
+![rainbow.jpg](assets/image/index/rainbow.jpg)
