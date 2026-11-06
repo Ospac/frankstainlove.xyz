@@ -7,8 +7,8 @@ INSTALL_ROOT="${1:-$(cd "$(dirname "$0")" && pwd)}"
 REQUESTED_VERSION="${2:-}"
 TEMP_DIR=""
 BACKUP_DIR=""
-PREVIOUS_SRC=""
-SWAPPED_SRC=0
+PREVIOUS_CMS=""
+SWAPPED_CMS=0
 COMMITTED=0
 
 die() {
@@ -29,9 +29,9 @@ rollback() {
 
     printf '\nUpdate failed. Restoring the previous installation...\n' >&2
 
-    if [ "$SWAPPED_SRC" -eq 1 ] && [ -n "$PREVIOUS_SRC" ] && [ -d "$PREVIOUS_SRC" ]; then
-        rm -rf "$INSTALL_ROOT/src"
-        mv "$PREVIOUS_SRC" "$INSTALL_ROOT/src"
+    if [ "$SWAPPED_CMS" -eq 1 ] && [ -n "$PREVIOUS_CMS" ] && [ -d "$PREVIOUS_CMS" ]; then
+        rm -rf "$INSTALL_ROOT/src/cms"
+        mv "$PREVIOUS_CMS" "$INSTALL_ROOT/src/cms"
     fi
 
     if [ -n "$BACKUP_DIR" ]; then
@@ -146,18 +146,18 @@ fi
 
 tar -xzf "$ARCHIVE" -C "$EXTRACTED"
 [ -d "$EXTRACTED/src/cms" ] || die "Release is missing src/cms"
-[ -d "$EXTRACTED/src/layout" ] || die "Release is missing src/layout"
 [ -f "$EXTRACTED/VERSION" ] || die "Release is missing VERSION"
 
 PACKAGE_VERSION=$(tr -d '[:space:]' < "$EXTRACTED/VERSION")
 [ "$PACKAGE_VERSION" = "$TARGET_VERSION" ] \
     || die "Release VERSION ($PACKAGE_VERSION) does not match tag ($TARGET_VERSION)"
 
-find "$EXTRACTED/src" -type f -name '*.php' -exec php -l {} \; >/dev/null
+find "$EXTRACTED/src/cms" -type f -name '*.php' -exec php -l {} \; >/dev/null
 
 BACKUP_DIR="$INSTALL_ROOT/.update-backups/${CURRENT_VERSION:-unknown}-$TIMESTAMP"
 mkdir -p "$BACKUP_DIR"
-cp -a "$INSTALL_ROOT/src" "$BACKUP_DIR/src"
+mkdir -p "$BACKUP_DIR/src"
+cp -a "$INSTALL_ROOT/src/cms" "$BACKUP_DIR/src/cms"
 [ -d "$INSTALL_ROOT/dist" ] && cp -a "$INSTALL_ROOT/dist" "$BACKUP_DIR/dist"
 [ -f "$INSTALL_ROOT/VERSION" ] && cp "$INSTALL_ROOT/VERSION" "$BACKUP_DIR/VERSION"
 for file in run_build.sh run_dev.sh update.sh; do
@@ -165,11 +165,11 @@ for file in run_build.sh run_dev.sh update.sh; do
 done
 
 printf 'Updating core from %s to %s...\n' "${CURRENT_VERSION:-unknown}" "$TARGET_VERSION"
-PREVIOUS_SRC="$INSTALL_ROOT/.src-previous-$$"
-cp -a "$EXTRACTED/src" "$INSTALL_ROOT/.src-candidate-$$"
-mv "$INSTALL_ROOT/src" "$PREVIOUS_SRC"
-SWAPPED_SRC=1
-mv "$INSTALL_ROOT/.src-candidate-$$" "$INSTALL_ROOT/src"
+PREVIOUS_CMS="$INSTALL_ROOT/.cms-previous-$$"
+cp -a "$EXTRACTED/src/cms" "$INSTALL_ROOT/.cms-candidate-$$"
+mv "$INSTALL_ROOT/src/cms" "$PREVIOUS_CMS"
+SWAPPED_CMS=1
+mv "$INSTALL_ROOT/.cms-candidate-$$" "$INSTALL_ROOT/src/cms"
 
 if ! php "$INSTALL_ROOT/src/cms/build.php"; then
     die "Build failed"
@@ -180,9 +180,9 @@ for file in run_build.sh run_dev.sh update.sh; do
     [ -f "$EXTRACTED/$file" ] && cp "$EXTRACTED/$file" "$INSTALL_ROOT/$file"
 done
 
-rm -rf "$PREVIOUS_SRC"
-PREVIOUS_SRC=""
-SWAPPED_SRC=0
+rm -rf "$PREVIOUS_CMS"
+PREVIOUS_CMS=""
+SWAPPED_CMS=0
 COMMITTED=1
 
 printf '\nUpdated lichen-markdown-custom to %s.\n' "$TARGET_VERSION"
