@@ -136,8 +136,8 @@ function render_func($path, $ext, $_src = "")
     include LAYOUT_DIR . '/' . $defaultLayoutFileName . '.php';
     $output = ob_get_clean();
     restore_error_handler();
-    $output = rewrite_asset_paths($output, $path);
-    return rewrite_internal_links($output, $path);
+    $output = rewrite_internal_links($output, $path);
+    return rewrite_asset_links($output, $path);
 }
 
 // -----------------------------------------------------------------------------
@@ -160,8 +160,6 @@ function save_dist($relative_src_path)
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $_md_src = fopen($sourcePath, "r") or die("File not found: " . $relative_src_path);
             $output = render_func($publicPath, $ext, $_md_src);
-            $output = rewrite_asset_paths($output, $publicPath);
-            $output = rewrite_internal_links($output, $publicPath);
             if ($pageSize !== null) {
                 $output = inject_page_size($output, $pageSize);
             }
@@ -363,7 +361,9 @@ function local_resource_path($url, $basePath) {
     if ($url === '') return null;
 
     if ($url[0] === '/') {
-        $path = PROJECT_DIR . '/' . ltrim($url, '/');
+        // Root-relative URLs point to the public build root. Assets are stored
+        // under page/assets in the source tree, but are exposed as /assets.
+        $path = DIST_DIR . '/' . ltrim($url, '/');
     } else {
         $path = dirname($basePath) . '/' . $url;
     }
@@ -379,7 +379,11 @@ function local_resource_path($url, $basePath) {
 
     // Assets may not have been symlinked into dist yet while a page is built.
     if (str_starts_with($resolved, DIST_DIR . '/')) {
-        $source = PROJECT_DIR . '/' . ltrim(substr($resolved, strlen(DIST_DIR)), '/');
+        $publicPath = substr($resolved, strlen(DIST_DIR));
+        // Use the same public-path mapping as the build process. This keeps
+        // page/assets available while a page is rendered before its symlink
+        // has been created in dist/assets.
+        $source = source_path($publicPath);
         if (is_file($source)) return $source;
     }
     return null;
@@ -443,29 +447,6 @@ function calculate_page_size($html, $outputPath) {
     return $total;
 }
 
-// -----------------------------------------------------------------------------
-// URL rewriting
-// -----------------------------------------------------------------------------
-
-// Return an asset URL relative to the rendered page's directory.
-function asset_url($pagePath, $assetPath) {
-    $pageDirectory = trim(str_replace('\\', '/', dirname($pagePath)), '/');
-    $depth = $pageDirectory === '' ? 0 : count(explode('/', $pageDirectory));
-
-    return str_repeat('../', $depth) . ltrim($assetPath, '/');
-}
-
-// Static pages cannot resolve root-relative asset URLs when served below a domain root.
-function rewrite_asset_paths($html, $pagePath) {
-    return preg_replace_callback(
-        '/(["\'])\/assets\/([^"\']*)/',
-        function ($matches) use ($pagePath) {
-            return $matches[1] . asset_url($pagePath, 'assets/' . $matches[2]);
-        },
-        $html
-    );
-}
-
 // Static builds expose rendered Markdown files as .html files, not .md routes.
 function rewrite_internal_links($html, $pagePath, $sourcePath = null) {
     return preg_replace_callback(
@@ -510,6 +491,27 @@ function rewrite_internal_links($html, $pagePath, $sourcePath = null) {
 
             $relativePath = str_repeat('../', count($baseSegments)) . implode('/', $resolved);
             return $matches[1] . $matches[2] . $relativePath . $parts[2] . $matches[2];
+        },
+        $html
+    );
+}
+
+// Rewrite root-relative public asset URLs so the static site also works when
+// deployed below a repository path, such as /lichen-markdown/ on GitHub Pages.
+function rewrite_asset_links($html, $pagePath) {
+    $outputPagePath = preg_replace('/\.md$/i', '.html', $pagePath);
+    $pageDirectory = trim(dirname($outputPagePath), '/');
+    $assetPrefix = str_repeat('../', $pageDirectory === '' ? 0 : count(explode('/', $pageDirectory)));
+
+    return preg_replace_callback(
+        '/(\b(?:href|src|srcset)\s*=\s*)(["\'])(.*?)\2/is',
+        function ($matches) use ($assetPrefix) {
+            $value = preg_replace(
+                '~(^|[\s,(])/(?:page/)?assets/~',
+                '$1' . $assetPrefix . 'assets/',
+                $matches[3]
+            );
+            return $matches[1] . $matches[2] . $value . $matches[2];
         },
         $html
     );
