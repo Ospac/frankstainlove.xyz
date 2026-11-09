@@ -1,0 +1,74 @@
+.photography-page {
+	display: block;
+	width: 100%;
+	max-width: none;
+	margin: 0;
+	padding: 0 2rem;
+}
+.photography-title-section > h2 {
+	display: inline;
+	margin: 0;
+	margin-right: 0.2rem;
+}
+.photography-list {
+	display: flex;
+	justify-content: flex-start;
+	margin: 1rem 0 2rem;
+	padding-left: 0;
+	padding-right: 2rem;
+	list-style: none;
+	overflow-x: auto;
+	overflow-y: hidden;
+	overscroll-behavior-x: contain;
+}
+
+.photography-list li {
+	flex: 0 0 auto;
+	padding-right: 1.75rem;
+}
+.photography-list li:not(:first-child) {
+	padding-left: 1.75rem;
+}
+.photography-list .description-item {	
+	max-width: 60ch;
+}
+.photography-list img {
+	height: 85vh;
+	width: auto;
+	max-width: none;
+	margin: 0;
+}
+.photography-description-item {
+	border-right: 1px dashed black;
+}
+.photography-page p,
+.photography-page pre,
+.photography-page blockquote {
+	box-sizing: border-box;
+	width: min(60ch, 75vw);
+	margin: 0;
+}
+
+.photography-page p {
+	font-size: 1rem;
+}
+
+.photography-page pre {
+	white-space: pre-wrap;
+}
+.popover-container{
+	position: relative;
+  display: inline;
+}
+.popover-image {
+  display: none;
+  position: absolute;
+  left: 0;
+  z-index: 10;
+}
+.popover-image img{
+	width: 15rem;
+}
+.popover-container:hover .popover-image {
+  display: block;
+}

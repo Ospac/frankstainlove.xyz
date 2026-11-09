@@ -10,7 +10,6 @@
 	<body>
 		<header>
 			<?php echo $header ?>
-			<?php echo render_component('brief') ?>
 		</header>
 		<main>
 			<?php echo $body ?>
