@@ -92,7 +92,9 @@ pre {
   border-radius: 4px;
   font-family: monospace;
 }
-
+.footnotes li::marker {
+	color: #000;
+}
 li::marker {
 	color: #98cfbe;
 }
