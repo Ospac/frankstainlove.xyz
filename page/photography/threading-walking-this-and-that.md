@@ -1,12 +1,7 @@
 ---
 title: 실꿰기, 이리저리 걷기
-layout: photography
+layout: photography-detail
 ---
-
-<section class="photography-title-section">
-	<h2>실꿰기, 이리저리 걷기</h2>
-	<sup>threading, walking this and that</sup>
-</section>
 
 <ul class="photography-list">
 	<li>

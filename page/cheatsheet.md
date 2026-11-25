@@ -1,4 +1,4 @@
-# Markdown 도우미
+	# Markdown 도우미
 
 _이 파일은 lichen CMS에서 원본과 함께 보는 것을 전제로 합니다. 이 [링크](/cms/edit.php/page/cheatsheet.md)를 따라가거나 마우스 오른쪽 버튼을 클릭한 뒤 `소스 보기`를 선택하면 원본을 확인할 수 있습니다. 이 Markdown 문법의 자세한 내용은 [PHP Markdown](https://github.com/michelf/php-markdown?tab=readme-ov-file) 문서를 참고하세요._
 

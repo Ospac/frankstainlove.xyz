@@ -16,18 +16,21 @@ body {
   margin: 0;
 }
 main {
-	font-size: 1.15rem;
+	font-size: 1rem;
 	line-height: 1.5;
   max-width: 72ch;
   flex: auto;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 3rem 1rem 1rem;
 }
 a, a:visited {
 	color: #000EEE;
+	text-decoration: none;
+	text-underline-offset: 4px;
 }
 a:hover, a:active {
-	color: #FF0000;
+	/*color: #FF0000;*/
+	text-decoration: underline dotted red 2px;
 }
 a.visited {
 	color: #551A8B;
@@ -90,7 +93,9 @@ pre {
   font-family: monospace;
 }
 
-
+li::marker {
+	color: #98cfbe;
+}
 ol li {
   margin: 0.4rem 0;
 }
@@ -117,6 +122,10 @@ main video {
   aspect-ratio: 16 / 9;
 }
 
+header {
+	font-size: 1rem;
+	position: fixed;
+}
 header .back-link {
   display: inline-flex;
   align-items: center;

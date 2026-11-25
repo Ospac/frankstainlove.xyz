@@ -14,23 +14,17 @@
 	<body>
 		<header>
 			<menu>
-				<a href="/">frankstainlove.xyz</a>
+				<a href="/">...</a>
 				/
 				<a href="/photography/index.md">photography</a>
 				/
-				<div class="popover-container">
-					<a href="/photography/threading-walking-this-and-that" aria-label="실꿰기, 이리저리 걷기">실꿰기, 이리저리 걷기</a>
-					<div class="popover-image">
-						<img src="/assets/image/threading-walking-this-and-that/threading-walking-this-and-that-1.webp" >
-					</div>
-				</div>
+				<a href="">
+					<?php echo $title ?>
+				</a>
 			</menu>
 		</header>
 		<main class="photography-page">
 			<?php echo $body ?>
 		</main>
-		<footer>
-			<?php echo $footer ?>
-		</footer>
 	</body>
 </html>

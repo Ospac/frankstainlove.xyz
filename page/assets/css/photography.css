@@ -3,12 +3,6 @@
 	width: 100%;
 	max-width: none;
 	margin: 0;
-	padding: 0 2rem;
-}
-.photography-title-section > h2 {
-	display: inline;
-	margin: 0;
-	margin-right: 0.2rem;
 }
 .photography-list {
 	display: flex;
@@ -37,6 +31,11 @@
 	width: auto;
 	max-width: none;
 	margin: 0;
+}
+@media (max-width: 767px) {
+	.photography-list img {
+		width: 100%;
+	}
 }
 .photography-description-item {
 	border-right: 1px dashed black;
@@ -68,6 +67,7 @@
 }
 .popover-image img{
 	width: 15rem;
+ border: 2px dashed #ff5f5f;
 }
 .popover-container:hover .popover-image {
   display: block;

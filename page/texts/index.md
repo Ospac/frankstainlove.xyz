@@ -1,5 +1,5 @@
 ---
 title: frankstainlove.xyz
+category: texts
 ---
-
-[웹사이트를 가진다는 것](about-owning-a-website-in-the-fucking-world.md)
+- [웹사이트를 가진다는 것](about-owning-a-website-in-the-fucking-world.md)

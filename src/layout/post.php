@@ -14,7 +14,7 @@
 		<header>
 			<?php echo $header ?>
 		</header>
-		<main class="broider-leaves">
+		<main>
 			<?php echo $body ?>
 		</main>
 		<footer>
