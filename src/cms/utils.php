@@ -330,8 +330,8 @@ function format_file_size($bytes)
     $units = ['B', 'KB', 'MB', 'GB'];
     $size = (float) $bytes;
     $unit = 0;
-    while ($size >= 1024 && $unit < count($units) - 1) {
-        $size /= 1024;
+    while ($size >= 1000 && $unit < count($units) - 1) {
+        $size /= 1000;
         $unit++;
     }
 
